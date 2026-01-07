@@ -18,11 +18,11 @@ const SkillSelector = ({ skills, selectedSkills, setSelectedSkills }) => {
           <button
             key={skill.name}
             onClick={() => toggleSkill(skill.name)}
-            className={`px-3 py-1 rounded border text-sm ${
-              selectedSkills.includes(skill.name)
-                ? "bg-indigo-600 text-white"
-                : "bg-white"
-            }`}
+               className={`px-3 py-1 rounded-full border text-sm transition active:scale-95 ${
+                 selectedSkills.includes(skill.name)
+                 ? "bg-indigo-600 text-white border-indigo-600"
+                  : "bg-white hover:bg-gray-100"
+                }`}
           >
             {skill.name}
           </button>

@@ -2,7 +2,7 @@ const RoleCard = ({ role, onSelect }) => {
   return (
     <div
       onClick={() => onSelect(role)}
-      className="bg-white rounded-xl p-6 shadow hover:shadow-lg hover:ring-2 hover:ring-indigo-500 transition cursor-pointer"
+      className="bg-white rounded-xl p-6 shadow hover:shadow-lg hover:-translate-y-0.5 transition cursor-pointer"
     >
       <h2 className="text-xl font-bold">{role.title}</h2>
 

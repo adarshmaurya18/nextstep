@@ -37,22 +37,36 @@ function App() {
     calculateReadiness(selectedRole.skills, selectedSkills);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        NextStep 🚀
-      </h1>
+    <div className="min-h-screen bg-gray-100 px-4 py-6 sm:px-8">
+      <header className="text-center mb-8">
+           <h1 className="text-3xl sm:text-4xl font-bold">
+               NextStep 🚀
+           </h1>
+
+           <p className="mt-2 text-gray-600 max-w-xl mx-auto">
+             See how close you are to a job, what to learn next,
+              and how it impacts salary.
+          </p>
+      </header>
 
       {!selectedRole && (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {roles.map((role) => (
-            <RoleCard
-              key={role.id}
-              role={role}
-              onSelect={setSelectedRole}
-            />
-          ))}
-        </div>
-      )}
+  <>
+    <p className="text-center text-gray-600 mb-6 max-w-xl mx-auto">
+      Pick a role to get a personalized readiness score and a step-by-step learning plan.
+    </p>
+
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {roles.map((role) => (
+        <RoleCard
+          key={role.id}
+          role={role}
+          onSelect={setSelectedRole}
+        />
+      ))}
+    </div>
+  </>
+)}
+
 
       {selectedRole && (
         <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
@@ -75,6 +89,13 @@ function App() {
             <div className="mt-6 space-y-3">
               <p className="text-lg font-semibold">
                 Readiness: {readiness.percentage}%
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                 <div
+                className="bg-indigo-600 h-3 rounded-full transition-all duration-300"
+                 style={{ width: `${readiness.percentage}%` }}
+                  />
+                 </div>
+
               </p>
 
               <p className="text-sm text-gray-600">
@@ -123,7 +144,12 @@ function App() {
           </button>
         </div>
       )}
+      <footer className="mt-12 text-center text-xs text-gray-500">
+       Built with ❤️ for career clarity · NextStep v1
+      </footer>
+
     </div>
+    
   );
 }
 
