@@ -1,155 +1,192 @@
-import { useState, useEffect } from "react";
-import { roles } from "./data/roles";
+import { useState } from "react";
 import RoleCard from "./components/RoleCard";
-import SkillSelector from "./components/SkillSelector";
-import { calculateReadiness } from "./utils/calculateReadiness";
+import Trending from "./pages/Trending";
+import Salary from "./pages/Salary";
+import { roles } from "./data/roles";
 
 function App() {
+  const [currentPage, setCurrentPage] = useState("home");
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedSkills, setSelectedSkills] = useState([]);
 
-  // ✅ LOAD saved data (runs once)
-  useEffect(() => {
-    const savedRole = localStorage.getItem("selectedRole");
-    const savedSkills = localStorage.getItem("selectedSkills");
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+    setSelectedSkills([]);
+  };
 
-    if (savedRole) {
-      setSelectedRole(JSON.parse(savedRole));
-    }
-    if (savedSkills) {
-      setSelectedSkills(JSON.parse(savedSkills));
-    }
-  }, []);
-
-  // ✅ SAVE data when state changes
-  useEffect(() => {
-    if (selectedRole) {
-      localStorage.setItem("selectedRole", JSON.stringify(selectedRole));
-      localStorage.setItem(
-        "selectedSkills",
-        JSON.stringify(selectedSkills)
-      );
-    }
-  }, [selectedRole, selectedSkills]);
+  const toggleSkill = (skill) => {
+    setSelectedSkills((prev) =>
+      prev.includes(skill)
+        ? prev.filter((s) => s !== skill)
+        : [...prev, skill]
+    );
+  };
 
   const readiness =
-    selectedRole &&
-    calculateReadiness(selectedRole.skills, selectedSkills);
+    selectedRole
+      ? Math.round(
+          (selectedSkills.length / selectedRole.skills.length) * 100
+        )
+      : 0;
+
+  const missingSkills =
+    selectedRole
+      ? selectedRole.skills.filter(
+          (skill) => !selectedSkills.includes(skill)
+        )
+      : [];
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-6 sm:px-8">
-      <header className="text-center mb-8">
-           <h1 className="text-3xl sm:text-4xl font-bold">
-               NextStep 🚀
-           </h1>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* HEADER + NAV */}
+      <header className="bg-white shadow-sm">
+        <div className="flex justify-between items-center px-6 py-4">
+          <h1 className="text-2xl font-bold">NextStep 🚀</h1>
 
-           <p className="mt-2 text-gray-600 max-w-xl mx-auto">
-             See how close you are to a job, what to learn next,
-              and how it impacts salary.
-          </p>
+          <nav className="flex gap-3">
+            <button
+              onClick={() => {
+                setCurrentPage("home");
+                setSelectedRole(null);
+              }}
+              className={`px-4 py-2 rounded-lg text-sm ${
+                currentPage === "home"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100"
+              }`}
+            >
+              Home
+            </button>
+
+            <button
+              onClick={() => {
+                setCurrentPage("trending");
+                setSelectedRole(null);
+              }}
+              className={`px-4 py-2 rounded-lg text-sm ${
+                currentPage === "trending"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100"
+              }`}
+            >
+              Trending Jobs
+            </button>
+
+            <button
+              onClick={() => {
+                setCurrentPage("salary");
+                setSelectedRole(null);
+              }}
+              className={`px-4 py-2 rounded-lg text-sm ${
+                currentPage === "salary"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100"
+              }`}
+            >
+              Salary
+            </button>
+          </nav>
+        </div>
       </header>
 
-      {!selectedRole && (
-  <>
-    <p className="text-center text-gray-600 mb-6 max-w-xl mx-auto">
-      Pick a role to get a personalized readiness score and a step-by-step learning plan.
-    </p>
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-6">
+        {currentPage === "trending" && <Trending />}
+        {currentPage === "salary" && <Salary />}
 
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {roles.map((role) => (
-        <RoleCard
-          key={role.id}
-          role={role}
-          onSelect={setSelectedRole}
-        />
-      ))}
-    </div>
-  </>
-)}
+        {currentPage === "home" && (
+          <>
+            {!selectedRole && (
+              <>
+                <h2 className="text-xl font-semibold mb-4">
+                  Select a role to analyze your readiness
+                </h2>
 
-
-      {selectedRole && (
-        <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
-          <h2 className="text-2xl font-bold">
-            {selectedRole.title}
-          </h2>
-
-          <p className="text-sm text-gray-600 mb-4">
-            Salary: {selectedRole.salary} · Demand:{" "}
-            {selectedRole.demand}
-          </p>
-
-          <SkillSelector
-            skills={selectedRole.skills}
-            selectedSkills={selectedSkills}
-            setSelectedSkills={setSelectedSkills}
-          />
-
-          {readiness && (
-            <div className="mt-6 space-y-3">
-              <p className="text-lg font-semibold">
-                Readiness: {readiness.percentage}%
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                 <div
-                className="bg-indigo-600 h-3 rounded-full transition-all duration-300"
-                 style={{ width: `${readiness.percentage}%` }}
-                  />
-                 </div>
-
-              </p>
-
-              <p className="text-sm text-gray-600">
-                Estimated time to job:{" "}
-                <span className="font-medium">
-                  {readiness.monthsToJob} month(s)
-                </span>
-              </p>
-
-              {readiness.missingSkills.length > 0 ? (
-                <div>
-                  <p className="font-medium mb-1">
-                    Learn these next:
-                  </p>
-                  <ul className="list-decimal list-inside text-sm">
-                    {readiness.missingSkills.map((skill) => (
-                      <li key={skill.name}>
-                        {skill.name}
-                        {skill.salaryBoost > 0 && (
-                          <span className="text-green-600">
-                            {" "}
-                            (+salary impact)
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {roles.map((role) => (
+                    <RoleCard
+                      key={role.id}
+                      role={role}
+                      onSelect={handleRoleSelect}
+                    />
+                  ))}
                 </div>
-              ) : (
-                <p className="text-green-600 font-medium">
-                  🎉 You are job-ready!
+              </>
+            )}
+
+            {selectedRole && (
+              <div className="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
+                <h2 className="text-2xl font-bold mb-1">
+                  {selectedRole.title}
+                </h2>
+
+                <p className="text-gray-600 mb-4">
+                  Avg Salary: <strong>{selectedRole.avgSalary}</strong>
                 </p>
-              )}
-            </div>
-          )}
 
-          <button
-            onClick={() => {
-              setSelectedRole(null);
-              setSelectedSkills([]);
-              localStorage.clear();
-            }}
-            className="mt-6 text-sm text-indigo-600 underline"
-          >
-            ← Change role
-          </button>
-        </div>
-      )}
-      <footer className="mt-12 text-center text-xs text-gray-500">
-       Built with ❤️ for career clarity · NextStep v1
+                {/* READINESS */}
+                <div className="mb-6">
+                  <p className="font-semibold mb-1">
+                    Readiness: {readiness}%
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="bg-indigo-600 h-3 rounded-full transition-all"
+                      style={{ width: `${readiness}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* SKILLS */}
+                <h3 className="font-semibold mb-3">
+                  Select the skills you already know:
+                </h3>
+
+                <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                  {selectedRole.skills.map((skill) => (
+                    <label
+                      key={skill}
+                      className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedSkills.includes(skill)}
+                        onChange={() => toggleSkill(skill)}
+                      />
+                      <span>{skill}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* MISSING SKILLS */}
+                {missingSkills.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="font-semibold mb-2 text-red-600">
+                      Skills to learn next:
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {missingSkills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      {/* FOOTER */}
+      <footer className="bg-white py-4 text-center text-sm text-gray-500">
+        © 2026 NextStep · Built for career clarity 🇮🇳
       </footer>
-
     </div>
-    
   );
 }
 
