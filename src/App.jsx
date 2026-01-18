@@ -3,6 +3,10 @@ import RoleCard from "./components/RoleCard";
 import Trending from "./pages/Trending";
 import Salary from "./pages/Salary";
 import { roles } from "./data/roles";
+import { recommendRoles } from "./utils/recommendRoles";
+import ReadinessChart from "./components/charts/ReadinessChart";
+import TrendChart from "./components/charts/TrendChart";
+
 
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -34,6 +38,11 @@ function App() {
       ? selectedRole.skills.filter(
           (skill) => !selectedSkills.includes(skill)
         )
+      : [];
+
+  const recommendations =
+    selectedRole && selectedSkills.length > 0
+      ? recommendRoles(roles, selectedRole, selectedSkills)
       : [];
 
   return (
@@ -96,6 +105,7 @@ function App() {
 
         {currentPage === "home" && (
           <>
+            {/* ROLE LIST */}
             {!selectedRole && (
               <>
                 <h2 className="text-xl font-semibold mb-4">
@@ -114,6 +124,7 @@ function App() {
               </>
             )}
 
+            {/* ROLE DETAILS */}
             {selectedRole && (
               <div className="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
                 <h2 className="text-2xl font-bold mb-1">
@@ -176,8 +187,53 @@ function App() {
                     </div>
                   </div>
                 )}
+
+                {/* RECOMMENDATIONS */}
+                {recommendations.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-3">
+                      🎯 Recommended Roles for You
+                    </h3>
+
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {recommendations.map((role) => (
+                        <div
+                          key={role.id}
+                          className="bg-green-50 border border-green-200 rounded-lg p-4"
+                        >
+                          <h4 className="font-bold mb-1">
+                            {role.title}
+                          </h4>
+
+                          <p className="text-sm">
+                            Readiness: <strong>{role.readiness}%</strong>
+                          </p>
+
+                          <p className="text-sm">
+                            Demand: <strong>{role.demand}</strong>
+                          </p>
+
+                          <p className="text-sm">
+                            Salary: <strong>{role.avgSalary}</strong>
+                          </p>
+
+                          <p className="text-xs text-gray-600 mt-2">
+                            Why: Your skills match {role.matchedSkillsCount} key
+                            skills and this role has strong market demand.
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
+            {/* CHARTS */}
+                <ReadinessChart
+                  selectedRole={selectedRole}
+                  selectedSkills={selectedSkills}
+                />
+                <TrendChart roles={roles} />
           </>
         )}
       </main>
