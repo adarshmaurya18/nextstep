@@ -6,9 +6,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-<p className="text-sm text-gray-600 mb-3">
-  Taller bars = skills you already have. Shorter bars = skills to improve.
-</p>
 
 const ReadinessChart = ({ selectedRole, selectedSkills }) => {
   if (!selectedRole) return null;
@@ -20,20 +17,26 @@ const ReadinessChart = ({ selectedRole, selectedSkills }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-5 mt-8">
-      <h3 className="text-lg font-semibold mb-4">
+      <h3 className="text-lg font-semibold mb-1">
         📊 Skill Readiness Breakdown
       </h3>
 
-      <div style={{ width: "100%", height: 250 }}>
-        <ResponsiveContainer>
-          <BarChart data={data}>
-            <XAxis dataKey="skill" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value" fill="#4f46e5" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <p className="text-sm text-gray-600 mb-4">
+        Longer bars = stronger skills · Shorter bars = skills to improve
+      </p>
+
+      <ResponsiveContainer width="100%" height={320}>
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ left: 40 }}
+        >
+          <XAxis type="number" domain={[0, 100]} />
+          <YAxis dataKey="skill" type="category" width={120} />
+          <Tooltip />
+          <Bar dataKey="value" fill="#6366f1" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

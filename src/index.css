@@ -2,3 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+.recharts-wrapper,
+.recharts-surface,
+.recharts-layer,
+svg {
+  overflow: visible !important;
+}
