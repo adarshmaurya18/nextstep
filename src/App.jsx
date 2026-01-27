@@ -6,6 +6,11 @@ import { roles } from "./data/roles";
 import { recommendRoles } from "./utils/recommendRoles";
 import ReadinessChart from "./components/charts/ReadinessChart";
 import TrendChart from "./components/charts/TrendChart";
+import Blogs from "./pages/Blogs";
+import News from "./pages/News";
+import GithubTrends from "./pages/GithubTrends";
+import HackerNews from "./pages/HackerNews";
+
 
 
 function App() {
@@ -82,6 +87,31 @@ function App() {
             </button>
 
             <button
+          onClick={() => setCurrentPage("news")}
+           className={`px-4 py-2 rounded-lg text-sm ${
+          currentPage === "news"
+          ? "bg-indigo-600 text-white"
+           : "bg-gray-100"
+            }`}
+           >
+          News
+        </button>
+
+            <button
+               onClick={() => {
+               setCurrentPage("blogs");
+               setSelectedRole(null);
+               }}
+               className={`px-4 py-2 rounded-lg text-sm ${
+               currentPage === "blogs"
+               ? "bg-indigo-600 text-white"
+               : "bg-gray-100"
+              }`}
+              >
+           Blogs
+             </button>
+
+            <button
               onClick={() => {
                 setCurrentPage("salary");
                 setSelectedRole(null);
@@ -94,6 +124,30 @@ function App() {
             >
               Salary
             </button>
+                <button
+          onClick={() => setCurrentPage("github")}
+          className={`px-4 py-2 rounded-lg text-sm ${
+          currentPage === "github"
+          ? "bg-indigo-600 text-white"
+          : "bg-gray-100"
+             }`}
+           >
+           GitHub Trends
+           </button>
+                        <button
+                 onClick={() => setCurrentPage("hn")}
+                 className={`px-4 py-2 rounded-lg text-sm ${
+                 currentPage === "hn"
+                 ? "bg-indigo-600 text-white"
+                 : "bg-gray-100"
+                  }`}
+                   >
+                   Hacker News
+                   </button>
+
+
+
+
           </nav>
         </div>
       </header>
@@ -102,6 +156,12 @@ function App() {
       <main className="flex-1 p-6">
         {currentPage === "trending" && <Trending />}
         {currentPage === "salary" && <Salary />}
+        {currentPage === "blogs" && <Blogs />}
+        {currentPage === "news" && <News />}
+        {currentPage === "github" && <GithubTrends />}
+        {currentPage === "hn" && <HackerNews />}
+
+
 
         {currentPage === "home" && (
           <>
