@@ -10,6 +10,7 @@ import Blogs from "./pages/Blogs";
 import News from "./pages/News";
 import GithubTrends from "./pages/GithubTrends";
 import HackerNews from "./pages/HackerNews";
+import SkillTest from "./pages/SkillTest";
 
 
 
@@ -144,9 +145,17 @@ function App() {
                    >
                    Hacker News
                    </button>
+                 <button onClick={() => setCurrentPage("test")}
+                   className={`px-4 py-2 rounded-lg text-sm ${
+                  currentPage === "test"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100"
+                  }`}
+                  >
+                   Skill Test
+              </button>
 
-
-
+                 
 
           </nav>
         </div>
@@ -160,6 +169,9 @@ function App() {
         {currentPage === "news" && <News />}
         {currentPage === "github" && <GithubTrends />}
         {currentPage === "hn" && <HackerNews />}
+        {currentPage === "test" && <SkillTest />}
+
+
 
 
 
