@@ -57,6 +57,19 @@ const SkillTest = () => {
 
   if (showResult) {
     const percentage = Math.round((score / questions.length) * 100);
+         // ✅ Save skill score
+     const savedScores =
+     JSON.parse(localStorage.getItem("skillScores")) || {};
+
+       savedScores[selectedSkill] = percentage;
+
+    sessionStorage.setItem(
+    "skillScores",
+      JSON.stringify(savedScores)
+    );
+
+  
+       
 
     let level = "Beginner";
     if (percentage >= 70) level = "Advanced";
