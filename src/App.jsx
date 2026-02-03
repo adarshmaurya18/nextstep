@@ -11,6 +11,7 @@ import HackerNews from "./pages/HackerNews";
 import SkillTest from "./pages/SkillTest";
 import PageTransition from "./components/PageTransition";
 import HeroSection from "./components/HeroSection";
+
 import { roles } from "./data/roles";
 import { recommendRoles } from "./utils/recommendRoles";
 import ReadinessChart from "./components/charts/ReadinessChart";
@@ -20,6 +21,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedSkills, setSelectedSkills] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [skillScores, setSkillScores] = useState(() => {
     return JSON.parse(sessionStorage.getItem("skillScores")) || {};
@@ -36,6 +38,7 @@ function App() {
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
     setSelectedSkills([]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const toggleSkill = (skill) => {
@@ -74,77 +77,110 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* HEADER */}
-      <header className="bg-white shadow-sm">
-        <div className="flex justify-between items-center px-6 py-4">
-          <h1 className="text-2xl font-bold">NextStep 🚀</h1>
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <h1 className="text-xl font-bold">NextStep 🚀</h1>
 
-          <nav className="flex gap-3 flex-wrap">
-            {[
-              ["home", "Home"],
-              ["trending", "Trending Jobs"],
-              ["news", "News"],
-              ["blogs", "Blogs"],
-              ["salary", "Salary"],
-              ["github", "GitHub Trends"],
-              ["hn", "Hacker News"],
-              ["test", "Skill Test"],
-            ].map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setCurrentPage(key);
-                  if (key !== "home") setSelectedRole(null);
-                }}
-                className={`px-4 py-2 rounded-lg text-sm transition ${
-                  currentPage === key
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex gap-3">
+              {[
+                ["home", "Home"],
+                ["trending", "Trending Jobs"],
+                ["news", "News"],
+                ["blogs", "Blogs"],
+                ["salary", "Salary"],
+                ["github", "GitHub"],
+                ["hn", "Hacker News"],
+                ["test", "Skill Test"],
+              ].map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setCurrentPage(key);
+                    setSelectedRole(null);
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm transition ${
+                    currentPage === key
+                      ? "bg-indigo-600 text-white"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden text-2xl"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              ☰
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t bg-white">
+            <div className="px-4 py-4 flex flex-col gap-2">
+              {[
+                ["home", "Home"],
+                ["trending", "Trending Jobs"],
+                ["news", "News"],
+                ["blogs", "Blogs"],
+                ["salary", "Salary"],
+                ["github", "GitHub"],
+                ["hn", "Hacker News"],
+                ["test", "Skill Test"],
+              ].map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setCurrentPage(key);
+                    setSelectedRole(null);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-left px-4 py-2 rounded-lg hover:bg-gray-100"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* MAIN */}
-      <main className="flex-1 p-6">
-        {currentPage === "trending" && (
-          <PageTransition><Trending /></PageTransition>
+      <main className="flex-1">
+        {currentPage !== "home" && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <PageTransition>
+              {currentPage === "trending" && <Trending />}
+              {currentPage === "salary" && <Salary />}
+              {currentPage === "blogs" && <Blogs />}
+              {currentPage === "news" && <News />}
+              {currentPage === "github" && <GithubTrends />}
+              {currentPage === "hn" && <HackerNews />}
+              {currentPage === "test" && <SkillTest />}
+            </PageTransition>
+          </div>
         )}
-        {currentPage === "salary" && (
-          <PageTransition><Salary /></PageTransition>
-        )}
-        {currentPage === "blogs" && (
-          <PageTransition><Blogs /></PageTransition>
-        )}
-        {currentPage === "news" && (
-          <PageTransition><News /></PageTransition>
-        )}
-        {currentPage === "github" && (
-          <PageTransition><GithubTrends /></PageTransition>
-        )}
-        {currentPage === "hn" && (
-          <PageTransition><HackerNews /></PageTransition>
-        )}
-        {currentPage === "test" && (
-          <PageTransition><SkillTest /></PageTransition>
-        )}
-          
 
-        {/* HOME */}
         {currentPage === "home" && (
-          <PageTransition>
-            <>
+          <>
             <HeroSection
-               onExplore={() => window.scrollTo({ top: 600, behavior: "smooth" })}
-               onTest={() => setCurrentPage("test")}
-                   />
+              onExplore={() =>
+                window.scrollTo({ top: 700, behavior: "smooth" })
+              }
+              onTest={() => setCurrentPage("test")}
+            />
 
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               {!selectedRole && (
                 <>
-                  <h2 className="text-xl font-semibold mb-4">
+                  <h2 className="text-xl font-semibold mb-6">
                     Select a role to analyze your readiness
                   </h2>
 
@@ -162,9 +198,9 @@ function App() {
 
               {selectedRole && (
                 <motion.div
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
                   className="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto"
                 >
                   <button
@@ -174,7 +210,7 @@ function App() {
                     ← Back to roles
                   </button>
 
-                  <h2 className="text-2xl font-bold mb-1">
+                  <h2 className="text-2xl font-bold mb-2">
                     {selectedRole.title}
                   </h2>
 
@@ -182,7 +218,7 @@ function App() {
                     Avg Salary: <strong>{selectedRole.avgSalary}</strong>
                   </p>
 
-                  {/* READINESS */}
+                  {/* Readiness */}
                   <div className="mb-6">
                     <p className="font-semibold mb-1">
                       Readiness: {readiness}%
@@ -191,23 +227,17 @@ function App() {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${readiness}%` }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        transition={{ duration: 0.6 }}
                         className="bg-indigo-600 h-3 rounded-full"
                       />
                     </div>
                   </div>
 
-                  {/* SKILLS */}
-                  <h3 className="font-semibold mb-3">
-                    Select the skills you already know:
-                  </h3>
-
+                  {/* Skills */}
                   <div className="grid sm:grid-cols-2 gap-3 mb-6">
                     {selectedRole.skills.map((skill) => (
-                      <motion.label
+                      <label
                         key={skill}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
                         className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
                       >
                         <input
@@ -216,20 +246,18 @@ function App() {
                           onChange={() => toggleSkill(skill)}
                         />
                         <span>{skill}</span>
-
                         {skillScores[skill] && (
                           <span className="text-xs text-green-600 ml-2">
-                            ✓ Test score: {skillScores[skill]}%
+                            ✓ {skillScores[skill]}%
                           </span>
                         )}
-                      </motion.label>
+                      </label>
                     ))}
                   </div>
 
-                  {/* MISSING SKILLS */}
                   {missingSkills.length > 0 && (
                     <div className="mb-6">
-                      <h4 className="font-semibold mb-2 text-red-600">
+                      <h4 className="font-semibold text-red-600 mb-2">
                         Skills to learn next:
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -244,37 +272,6 @@ function App() {
                       </div>
                     </div>
                   )}
-
-                  {/* RECOMMENDATIONS */}
-                  {recommendations.length > 0 && (
-                    <div className="mt-8">
-                      <h3 className="text-xl font-semibold mb-3">
-                        🎯 Recommended Roles for You
-                      </h3>
-
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {recommendations.map((role) => (
-                          <div
-                            key={role.id}
-                            className="bg-green-50 border border-green-200 rounded-lg p-4"
-                          >
-                            <h4 className="font-bold mb-1">
-                              {role.title}
-                            </h4>
-                            <p className="text-sm">
-                              Readiness: <strong>{role.readiness}%</strong>
-                            </p>
-                            <p className="text-sm">
-                              Demand: <strong>{role.demand}</strong>
-                            </p>
-                            <p className="text-sm">
-                              Salary: <strong>{role.avgSalary}</strong>
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </motion.div>
               )}
 
@@ -283,12 +280,11 @@ function App() {
                 selectedSkills={selectedSkills}
               />
               <TrendChart roles={roles} />
-            </>
-          </PageTransition>
+            </div>
+          </>
         )}
       </main>
 
-      {/* FOOTER */}
       <footer className="bg-white py-4 text-center text-sm text-gray-500">
         © 2026 NextStep · Built for career clarity 🇮🇳
       </footer>

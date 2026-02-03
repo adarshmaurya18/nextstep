@@ -8,3 +8,6 @@
 svg {
   overflow: visible !important;
 }
+html, body {
+  overflow-x: hidden;
+}

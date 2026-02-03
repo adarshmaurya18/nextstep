@@ -22,7 +22,12 @@ const RoleCard = ({ role, onSelect }) => {
       }}
       whileTap={{ scale: 0.97 }}
       onClick={() => onSelect(role)}
-      className="cursor-pointer bg-white rounded-xl p-5 border border-gray-100"
+      className="
+  bg-white rounded-xl shadow-md p-5 cursor-pointer
+  hover:scale-[1.03] hover:shadow-xl
+  transition-all duration-300
+"
+
     >
       {/* ROLE TITLE */}
       <h2 className="text-xl font-bold text-gray-800">
