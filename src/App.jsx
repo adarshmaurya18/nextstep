@@ -1,37 +1,37 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+
 import RoleCard from "./components/RoleCard";
 import Trending from "./pages/Trending";
 import Salary from "./pages/Salary";
-import { roles } from "./data/roles";
-import { recommendRoles } from "./utils/recommendRoles";
-import ReadinessChart from "./components/charts/ReadinessChart";
-import TrendChart from "./components/charts/TrendChart";
 import Blogs from "./pages/Blogs";
 import News from "./pages/News";
 import GithubTrends from "./pages/GithubTrends";
 import HackerNews from "./pages/HackerNews";
 import SkillTest from "./pages/SkillTest";
 import PageTransition from "./components/PageTransition";
+import HeroSection from "./components/HeroSection";
+import { roles } from "./data/roles";
+import { recommendRoles } from "./utils/recommendRoles";
+import ReadinessChart from "./components/charts/ReadinessChart";
+import TrendChart from "./components/charts/TrendChart";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedSkills, setSelectedSkills] = useState([]);
 
-  // ✅ Skill test scores (from SkillTest page)
   const [skillScores, setSkillScores] = useState(() => {
-  return JSON.parse(sessionStorage.getItem("skillScores")) || {};
-});
+    return JSON.parse(sessionStorage.getItem("skillScores")) || {};
+  });
 
-
-  // ✅ Load scores once on app mount
   useEffect(() => {
-  if (currentPage === "home") {
-    const stored =
-      JSON.parse(sessionStorage.getItem("skillScores")) || {};
-    setSkillScores(stored);
-  }
-}, [currentPage]);
+    if (currentPage === "home") {
+      const stored =
+        JSON.parse(sessionStorage.getItem("skillScores")) || {};
+      setSkillScores(stored);
+    }
+  }, [currentPage]);
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
@@ -46,7 +46,6 @@ function App() {
     );
   };
 
-  // ✅ Readiness = checkbox OR test score ≥ 60%
   const readiness = selectedRole
     ? Math.round(
         (selectedRole.skills.filter((skill) => {
@@ -59,7 +58,6 @@ function App() {
       )
     : 0;
 
-  // ✅ Missing skills (exclude test-verified ones)
   const missingSkills = selectedRole
     ? selectedRole.skills.filter((skill) => {
         if (selectedSkills.includes(skill)) return false;
@@ -97,10 +95,10 @@ function App() {
                   setCurrentPage(key);
                   if (key !== "home") setSelectedRole(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm ${
+                className={`px-4 py-2 rounded-lg text-sm transition ${
                   currentPage === key
                     ? "bg-indigo-600 text-white"
-                    : "bg-gray-100"
+                    : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
                 {label}
@@ -113,51 +111,37 @@ function App() {
       {/* MAIN */}
       <main className="flex-1 p-6">
         {currentPage === "trending" && (
-          <PageTransition>
-            <Trending />
-          </PageTransition>
+          <PageTransition><Trending /></PageTransition>
         )}
-
         {currentPage === "salary" && (
-          <PageTransition>
-            <Salary />
-          </PageTransition>
+          <PageTransition><Salary /></PageTransition>
         )}
-
         {currentPage === "blogs" && (
-          <PageTransition>
-            <Blogs />
-          </PageTransition>
+          <PageTransition><Blogs /></PageTransition>
         )}
-
         {currentPage === "news" && (
-          <PageTransition>
-            <News />
-          </PageTransition>
+          <PageTransition><News /></PageTransition>
         )}
-
         {currentPage === "github" && (
-          <PageTransition>
-            <GithubTrends />
-          </PageTransition>
+          <PageTransition><GithubTrends /></PageTransition>
         )}
-
         {currentPage === "hn" && (
-          <PageTransition>
-            <HackerNews />
-          </PageTransition>
+          <PageTransition><HackerNews /></PageTransition>
         )}
-
         {currentPage === "test" && (
-          <PageTransition>
-            <SkillTest />
-          </PageTransition>
+          <PageTransition><SkillTest /></PageTransition>
         )}
+          
 
         {/* HOME */}
         {currentPage === "home" && (
           <PageTransition>
             <>
+            <HeroSection
+               onExplore={() => window.scrollTo({ top: 600, behavior: "smooth" })}
+               onTest={() => setCurrentPage("test")}
+                   />
+
               {!selectedRole && (
                 <>
                   <h2 className="text-xl font-semibold mb-4">
@@ -177,8 +161,12 @@ function App() {
               )}
 
               {selectedRole && (
-                <div className="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
-                  {/* BACK BUTTON */}
+                <motion.div
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto"
+                >
                   <button
                     onClick={() => setSelectedRole(null)}
                     className="mb-4 text-sm text-indigo-600 font-semibold hover:underline"
@@ -200,9 +188,11 @@ function App() {
                       Readiness: {readiness}%
                     </p>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-indigo-600 h-3 rounded-full transition-all"
-                        style={{ width: `${readiness}%` }}
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${readiness}%` }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="bg-indigo-600 h-3 rounded-full"
                       />
                     </div>
                   </div>
@@ -214,8 +204,10 @@ function App() {
 
                   <div className="grid sm:grid-cols-2 gap-3 mb-6">
                     {selectedRole.skills.map((skill) => (
-                      <label
+                      <motion.label
                         key={skill}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
                       >
                         <input
@@ -230,7 +222,7 @@ function App() {
                             ✓ Test score: {skillScores[skill]}%
                           </span>
                         )}
-                      </label>
+                      </motion.label>
                     ))}
                   </div>
 
@@ -269,15 +261,12 @@ function App() {
                             <h4 className="font-bold mb-1">
                               {role.title}
                             </h4>
-
                             <p className="text-sm">
                               Readiness: <strong>{role.readiness}%</strong>
                             </p>
-
                             <p className="text-sm">
                               Demand: <strong>{role.demand}</strong>
                             </p>
-
                             <p className="text-sm">
                               Salary: <strong>{role.avgSalary}</strong>
                             </p>
@@ -286,10 +275,9 @@ function App() {
                       </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
 
-              {/* CHARTS */}
               <ReadinessChart
                 selectedRole={selectedRole}
                 selectedSkills={selectedSkills}

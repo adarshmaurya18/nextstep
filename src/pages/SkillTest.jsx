@@ -1,37 +1,31 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { SKILL_QUESTIONS } from "../data/skillQuestions";
 
-
 const SkillTest = () => {
-  const skills = Object.keys(SKILL_QUESTIONS);
-
-
   const [selectedSkill, setSelectedSkill] = useState(null);
-  const [currentQ, setCurrentQ] = useState(0);
+  const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [showResult, setShowResult] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   if (!selectedSkill) {
     return (
-      <div className="p-8 max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">
-          🧪 Skill Assessment Test
-        </h1>
+      <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
+        <h2 className="text-xl font-bold mb-4">
+          Choose a skill to test
+        </h2>
 
-        <p className="text-gray-600 mb-6">
-          Choose a skill and test your real-world understanding.
-        </p>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {skills.map((skill) => (
-            <button
+        <div className="grid gap-3">
+          {Object.keys(SKILL_QUESTIONS).map((skill) => (
+            <motion.button
               key={skill}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setSelectedSkill(skill)}
-              className="p-4 bg-white rounded-xl shadow hover:shadow-md font-semibold"
+              className="p-3 border rounded-lg hover:bg-gray-50"
             >
               {skill}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -39,110 +33,73 @@ const SkillTest = () => {
   }
 
   const questions = SKILL_QUESTIONS[selectedSkill];
-  const question = questions[currentQ];
+  const q = questions[current];
 
-  const handleNext = () => {
-    if (selectedOption === question.correctIndex) {
-      setScore((prev) => prev + 1);
-    }
+  const handleAnswer = (idx) => {
+    if (idx === q.correctIndex) setScore(score + 1);
 
-    setSelectedOption(null);
-
-    if (currentQ + 1 < questions.length) {
-      setCurrentQ((prev) => prev + 1);
+    if (current + 1 < questions.length) {
+      setCurrent(current + 1);
     } else {
-      setShowResult(true);
+      const percentage = Math.round(
+        ((idx === q.correctIndex ? score + 1 : score) /
+          questions.length) *
+          100
+      );
+
+      const saved =
+        JSON.parse(sessionStorage.getItem("skillScores")) || {};
+
+      saved[selectedSkill] = percentage;
+      sessionStorage.setItem("skillScores", JSON.stringify(saved));
+      setFinished(true);
     }
   };
 
-  if (showResult) {
-    const percentage = Math.round((score / questions.length) * 100);
-         // ✅ Save skill score
-     const savedScores =
-     JSON.parse(localStorage.getItem("skillScores")) || {};
-
-       savedScores[selectedSkill] = percentage;
-
-    sessionStorage.setItem(
-    "skillScores",
-      JSON.stringify(savedScores)
-    );
-
-  
-       
-
-    let level = "Beginner";
-    if (percentage >= 70) level = "Advanced";
-    else if (percentage >= 40) level = "Intermediate";
-
+  if (finished) {
     return (
-      <div className="p-8 max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-4">
-          🎯 Test Result
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow text-center"
+      >
+        <h2 className="text-2xl font-bold mb-2">
+          {selectedSkill} Score
         </h2>
-
-        <p className="text-xl mb-2">
-          Skill: <span className="font-semibold">{selectedSkill}</span>
+        <p className="text-4xl font-bold text-indigo-600">
+          {Math.round((score / questions.length) * 100)}%
         </p>
-
-        <p className="text-xl mb-2">
-          Score: {score} / {questions.length}
-        </p>
-
-        <p className="text-2xl font-bold mt-4">
-          Level: {level}
-        </p>
-
-        <button
-          onClick={() => {
-            setSelectedSkill(null);
-            setCurrentQ(0);
-            setScore(0);
-            setShowResult(false);
-          }}
-          className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-lg"
-        >
-          Take Another Test
-        </button>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <p className="text-sm text-gray-500 mb-2">
-        {selectedSkill} • Question {currentQ + 1} / {questions.length}
-      </p>
-
-      <h2 className="text-xl font-semibold mb-6">
-        {question.question}
+    <motion.div
+      key={current}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow"
+    >
+      <h2 className="text-lg font-semibold mb-4">
+        {selectedSkill} · Question {current + 1}
       </h2>
 
-      <div className="space-y-3">
-        {question.options.map((opt, idx) => (
-          <button
+      <p className="mb-4 font-medium">{q.question}</p>
+
+      <div className="grid gap-3">
+        {q.options.map((opt, idx) => (
+          <motion.button
             key={idx}
-            onClick={() => setSelectedOption(idx)}
-            className={`w-full text-left p-4 rounded-lg border 
-              ${
-                selectedOption === idx
-                  ? "border-indigo-600 bg-indigo-50"
-                  : "border-gray-200"
-              }`}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => handleAnswer(idx)}
+            className="p-3 border rounded-lg hover:bg-indigo-50 text-left"
           >
             {opt}
-          </button>
+          </motion.button>
         ))}
       </div>
-
-      <button
-        disabled={selectedOption === null}
-        onClick={handleNext}
-        className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-lg disabled:opacity-50"
-      >
-        {currentQ + 1 === questions.length ? "Finish Test" : "Next"}
-      </button>
-    </div>
+    </motion.div>
   );
 };
 
